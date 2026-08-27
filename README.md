@@ -17,24 +17,24 @@ With there being a rise in papers submitted to academic journals, top conference
 
 ## Current Usage
 PaperTrail accepts an arXiv identifier through its CLI interface:
-"papertrail 2401.12345"
+`papertrail 2401.12345`
 
 Example output:
 
-"Paper requested: 2401:12345"
+`Paper requested: 2401:12345`
 
 PaperTrail does NOT retrieve or audit the paper yet.
 
 ## Dev Setup
 Create and activate a Python 3.12 environment:
-
+```
 python3.12 -m venv .venv
 source .venv/bin/activate
-
+```
 Install PaperTrail and its dev dependencies:
 
-python -m pip install --editable ".[dev]"
+`python -m pip install --editable ".[dev]"`
 
 Run the tests:
 
-pytest
+`pytest`
