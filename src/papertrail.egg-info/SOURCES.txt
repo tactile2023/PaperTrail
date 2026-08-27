@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+src/papertrail/__init__.py
+src/papertrail/cli.py
+src/papertrail.egg-info/PKG-INFO
+src/papertrail.egg-info/SOURCES.txt
+src/papertrail.egg-info/dependency_links.txt
+src/papertrail.egg-info/entry_points.txt
+src/papertrail.egg-info/requires.txt
+src/papertrail.egg-info/top_level.txt

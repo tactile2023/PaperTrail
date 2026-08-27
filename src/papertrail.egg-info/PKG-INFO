@@ -1,3 +1,12 @@
+Metadata-Version: 2.4
+Name: papertrail
+Version: 0.1.0
+Summary: An evidence-backed integrity and reproducibility auditor for machine-learning papers on arXiv.
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+
 # PaperTrail
 PaperTrail is an evidence-backed scientific paper integrity auditor for machine-learning papers on arXiv. 
 
@@ -13,28 +22,3 @@ With there being a rise in papers submitted to academic journals, top conference
 - Detect potential inconsistencies across paper results
 - Generate evidence-backed reports
 - Evaluate the system using a manually annotated benchmark
-
-
-## Current Usage
-PaperTrail accepts an arXiv identifier through its CLI interface:
-"papertrail 2401.12345"
-
-Example output:
-
-"Paper requested: 2401:12345"
-
-PaperTrail does NOT retrieve or audit the paper yet.
-
-## Dev Setup
-Create and activate a Python 3.12 environment:
-
-python3.12 -m venv .venv
-source .venv/bin/activate
-
-Install PaperTrail and its dev dependencies:
-
-python -m pip install --editable ".[dev]"
-
-Run the tests:
-
-pytest
