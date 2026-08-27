@@ -1,5 +1,6 @@
 import argparse
 
+from .arxiv_id import normalize_arxiv_id
 
 def build_parser():
     parser = argparse.ArgumentParser(
@@ -16,4 +17,10 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
-    print(f"Paper requested: {args.paper}")
+    try:    
+        arxiv_id = normalize_arxiv_id(args.paper)
+    except ValueError as e:
+        parser.error(str(e))
+
+        
+    print(f"Paper requested: {arxiv_id}")
