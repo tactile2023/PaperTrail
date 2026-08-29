@@ -2,6 +2,18 @@ import pytest
 from papertrail.arxiv_id import normalize_arxiv_id
 
 
+def test_http_abs_url_is_normalized():
+    result = normalize_arxiv_id("http://arxiv.org/abs/1706.03762v7")
+    assert result == "1706.03762v7"
+
+def test_http_pdf_url_is_normalized():
+    result = normalize_arxiv_id("http://arxiv.org/pdf/1706.03762v7.pdf")
+    assert result == "1706.03762v7"
+
+def test_http_html_url_is_normalized():
+    result = normalize_arxiv_id("http://arxiv.org/html/1706.03762v7")
+    assert result == "1706.03762v7"
+
 def test_whitespace_input_is_rejected():
     with pytest.raises(ValueError):
         normalize_arxiv_id("    ")

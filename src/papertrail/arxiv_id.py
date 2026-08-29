@@ -8,12 +8,22 @@ def normalize_arxiv_id(string):
     if not string:
         raise ValueError("arXiv identifier cannot be empty")
 
-    
-    if string.startswith("https://arxiv.org/abs/"):
+    elif string.startswith("http://arxiv.org/abs/"):
+        string = string[len("http://arxiv.org/abs/"):]
+        
+    elif string.startswith("https://arxiv.org/abs/"):
         string = string[len("https://arxiv.org/abs/"):]
+
+    elif string.startswith("http://arxiv.org/html/"):
+        string = string[len("http://arxiv.org/html/"):]    
 
     elif string.startswith("https://arxiv.org/html/"):
         string = string[len("https://arxiv.org/html/"):]
+
+    elif string.startswith("http://arxiv.org/pdf/"):
+        string = string[len("http://arxiv.org/pdf/"):]
+        if string.endswith(".pdf"):
+            string = string[:-4]
 
     elif string.startswith("https://arxiv.org/pdf/"):
         string = string[len("https://arxiv.org/pdf/"):]
