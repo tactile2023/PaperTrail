@@ -24,6 +24,12 @@ PaperTrail can:
 - Extract the paper ID, title, summary, authors, dates, categories, and PDF URL
 - Handle invalid identifiers, missing papers, missing PDF links, and network errors
 - Run automated tests without depending on a live internet connection
+- Download the paper pDF from arXiv
+- Validate downloaded PDF content and extract text page by page
+- Preserve page numbers for future tracking
+- Report page and character counts
+- Handle invalid and corrupted PDF responses
+
 
 ## Installation
 ```bash

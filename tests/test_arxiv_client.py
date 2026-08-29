@@ -8,7 +8,7 @@ def test_fetch_arxiv_metadata_xml(monkeypatch):
     def fake_get(url, params, timeout):
         assert url == "https://export.arxiv.org/api/query"
         assert params == {"id_list": "1706.03762"}
-        assert timeout == 10.0
+        assert timeout == 30.0
 
         request = httpx.Request("GET", url)
         return httpx.Response(200, text=expected_xml, request=request)

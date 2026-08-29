@@ -4,6 +4,88 @@ import papertrail.cli as cli
 from papertrail.models import ArxivMetadata
 import httpx
 import pytest
+from papertrail.models import ArxivMetadata, ParsedPage
+from pypdf.errors import PdfReadError
+
+
+
+def test_cli_explains_arxiv_rate_limit(monkeypatch, capsys):
+    request = httpx.Request("GET", "https://export.arxiv.org/api/query")
+    response=httpx.Response(429, request=request)
+
+    def fake_fetch(arxiv_id):
+        raise httpx.HTTPStatusError("Too many requests", request=request, response=response)
+    
+    monkeypatch.setattr(cli, "fetch_arxiv_metadata_xml", fake_fetch)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["papertrail", "2507.01019"],
+    )
+
+    with pytest.raises(SystemExit) as error:
+        cli.main()
+
+    captured = capsys.readouterr()
+
+    assert error.value.code == 2
+    assert "arXiv rate limit reached" in captured.err
+    assert "Traceback" not in captured.err
+
+
+
+
+
+def test_cli_handles_corrup_pdf(monkeypatch, capsys):
+    metadata = ArxivMetadata(
+        arxiv_id="1706.03762v7",
+        title="Example Paper",
+        summary="Example summary",
+        authors=["Example Author"],
+        published="2017-06-12T17:57:34Z",
+        updated="2017-06-12T17:57:34Z",
+        categories=["cs.CL"],
+        pdf_url="https://arxiv.org/pdf/1706.03762v7",
+    )
+
+    monkeypatch.setattr(
+        cli,
+        "fetch_arxiv_metadata_xml",
+        lambda arxiv_id: "<feed>fake</feed>",
+    )
+    monkeypatch.setattr(
+        cli,
+        "parse_arxiv_metadata",
+        lambda xml_text: metadata
+    )
+    monkeypatch.setattr(
+        cli, 
+        "download_pdf",
+        lambda pdf_url: b"%PDF-corrupt"
+    )
+
+
+    def fake_parse_pdf(pdf_bytes):
+            raise PdfReadError("Broken PDF")
+
+    monkeypatch.setattr(cli, "parse_pdf", fake_parse_pdf)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["papertrail", "1706.03762"],
+    )
+
+    with pytest.raises(SystemExit) as error:
+        cli.main()
+
+    captured = capsys.readouterr()
+
+    assert error.value.code == 2
+    assert "Could not parse PDF" in captured.err
+    assert "Traceback" not in captured.err
+
+
+
 
 
 
@@ -43,6 +125,16 @@ def test_cli_displays_metadata(monkeypatch, capsys):
             pdf_url="https://arxiv.org/pdf/2401.12345v3",
         )
 
+
+    def fake_download(pdf_url):
+        assert pdf_url == "https://arxiv.org/pdf/2401.12345v3"
+        return b"%PDF-fake"
+    
+    def fake_parse_pdf(pdf_bytes):
+        assert pdf_bytes == b"%PDF-fake"
+    
+        return[ParsedPage(page_number=1, text="Example paper text")]
+
     monkeypatch.setattr(cli, "fetch_arxiv_metadata_xml", fake_fetch)
     monkeypatch.setattr(cli, "parse_arxiv_metadata", fake_parse)
     monkeypatch.setattr(
@@ -50,6 +142,8 @@ def test_cli_displays_metadata(monkeypatch, capsys):
         "argv",
         ["papertrail", "https://arxiv.org/abs/2401.12345"],
     )
+    monkeypatch.setattr(cli, "download_pdf", fake_download)
+    monkeypatch.setattr(cli, "parse_pdf", fake_parse_pdf)
 
     cli.main()
 
@@ -58,7 +152,9 @@ def test_cli_displays_metadata(monkeypatch, capsys):
     assert "arXiv ID: 2401.12345v3" in output
     assert "Title: Example Paper" in output
     assert "Authors: First Author, Second Author" in output
-
+    assert "Pages parsed: 1" in output
+    assert "Characters extracted: 18" in output
+    
 
 
 def test_cli_rejects_invalid_input_without_traceback():
