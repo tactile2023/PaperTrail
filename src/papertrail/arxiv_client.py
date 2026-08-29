@@ -10,4 +10,4 @@ def fetch_arxiv_metadata_xml(arxiv_id):
     )
     response.raise_for_status()
 
-    return response.texts
+    return response.text

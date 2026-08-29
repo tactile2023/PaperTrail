@@ -16,25 +16,19 @@ With there being a rise in papers submitted to academic journals, top conference
 
 
 ## Current Usage
-PaperTrail accepts an arXiv identifier through its CLI interface:
-`papertrail 2401.12345`
+PaperTrail can:
 
-Example output:
+- Accept a modern or legacy arXiv identifier or URL
+- Normalize `/abs/`, `/pdf/`, and `/html/` URLs
+- Retrieve metadata from the arXiv API
+- Extract the paper ID, title, summary, authors, dates, categories, and PDF URL
+- Handle invalid identifiers, missing papers, missing PDF links, and network errors
+- Run automated tests without depending on a live internet connection
 
-`Paper requested: 2401:12345`
-
-PaperTrail does NOT retrieve or audit the paper yet.
-
-## Dev Setup
-Create and activate a Python 3.12 environment:
-```
+## Installation
+```bash
+git clone git@github.com:tactile2023/PaperTrail.git
+cd PaperTrail
 python3.12 -m venv .venv
 source .venv/bin/activate
-```
-Install PaperTrail and its dev dependencies:
-
-`python -m pip install --editable ".[dev]"`
-
-Run the tests:
-
-`pytest`
+python -m pip install -e ".[dev]"
