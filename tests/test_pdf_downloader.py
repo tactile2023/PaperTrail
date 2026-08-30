@@ -2,7 +2,7 @@ import httpx
 import pytest
 
 
-from papertrail.pdf_downloader import download_pdf
+from arxit.pdf_downloader import download_pdf
 
 def test_download_pdf_returns_bytes(monkeypatch):
     expected_pdf = b"%PDF-1.7 fake PDF content"

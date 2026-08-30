@@ -1,0 +1,143 @@
+import re
+
+from .models import PaperSection
+
+
+NUMBERED_HEADING_PATTERN = re.compile(
+    r"^\d{1,2}(?:\.\d{1,2})*\.?\s+(.+)$"
+)
+
+APPENDIX_TITLE_PATTERN = re.compile(
+    r"^(?:Appendix\s+([A-Z])|([A-Z])\s+Appendix)"
+    r"(?:\s*[:-]?\s+(.+))?$",
+    re.IGNORECASE,
+)
+
+APPENDIX_SUBHEADING_PATTERN = re.compile(
+    r"^[A-Z]\.\d{1,2}(?:\.\d{1,2})*\.?\s+(.+)$"
+)
+
+KNOWN_HEADINGS = {
+    "abstract",
+    "references",
+    "bibliography",
+    "acknowledgments",
+    "acknowledgements",
+    "appendix",
+    "supplementary material",
+    "supplemental material",
+}
+
+
+def find_heading_title(line):
+    if line.lower() in KNOWN_HEADINGS:
+        return line.title()
+
+    appendix_title_match = APPENDIX_TITLE_PATTERN.match(line)
+
+    if appendix_title_match:
+        letter = (
+            appendix_title_match.group(1)
+            or appendix_title_match.group(2)
+        )
+        description = appendix_title_match.group(3)
+
+        title = f"Appendix {letter.upper()}"
+
+        if description:
+            title = f"{title}: {description.strip()}"
+
+        return title
+
+    appendix_subheading_match = APPENDIX_SUBHEADING_PATTERN.match(line)
+
+    if appendix_subheading_match:
+        candidate = appendix_subheading_match.group(1).strip()
+
+        if candidate.endswith((".", "?", "!")):
+            return None
+
+        return candidate
+
+
+
+
+    match = NUMBERED_HEADING_PATTERN.match(line)
+
+    if match: 
+        candidate = match.group(1).strip()
+
+        if not candidate[0].isalpha():
+            return None
+
+        if candidate[0].islower():
+            return None
+
+        numbered_list_item = (
+            re.match(r"^\d{1,2}\.\s+", line) is not None
+        )
+
+        if numbered_list_item and (
+            len(candidate.split()) > 8 or ". " in candidate
+        ):
+            return None
+
+        if candidate.endswith((".", "?", "!")):
+            return None
+
+        return candidate
+
+    return None
+
+
+
+
+
+def extract_sections(pages):
+    sections = []
+
+    current_title = None
+    current_lines = []
+    start_page = None
+    end_page = None
+
+    for page in pages:
+        for raw_line in page.text.splitlines():
+            line = raw_line.strip()
+
+            if not line:
+                continue
+
+            heading_title = find_heading_title(line)
+
+            if heading_title is not None:
+                if current_title is not None:
+                    sections.append(
+                        PaperSection(
+                            title= current_title,
+                            text="\n".join(current_lines),
+                            start_page=start_page,
+                            end_page=end_page
+                        )
+                    )
+
+                current_title = heading_title
+                current_lines = []
+                start_page = page.page_number
+                end_page = page.page_number
+
+            elif current_title is not None:
+                current_lines.append(line)
+                end_page = page.page_number
+
+    if current_title is not None:
+        sections.append(
+            PaperSection(
+                title=current_title,
+                text="\n".join(current_lines),
+                start_page=start_page,
+                end_page=end_page
+            )
+        )
+
+    return sections

@@ -12,13 +12,30 @@ class ArxivMetadata:
     pdf_url: str
 
 
+@dataclass
+class Reference:
+    label: str | None
+    raw_text: str
+
 
 @dataclass
 class ParsedPage:
     page_number: int
     text: str
 
+
+
+@dataclass
+class PaperSection:
+    title: str
+    text: str
+    start_page: str
+    end_page: str
+
+
 @dataclass
 class ParsedPaper:
     metadata: ArxivMetadata
     pages: list[ParsedPage]
+    sections: list[PaperSection]
+    references: list[Reference]

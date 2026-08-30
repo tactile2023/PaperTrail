@@ -1,5 +1,5 @@
 [project]
-name = "papertrail"
+name = "arxit"
 version = "0.3.0"
 description = "An evidence-backed integrity and reproducibility auditor for machine-learning papers on arXiv."
 readme = "README.md"
@@ -17,7 +17,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [project.scripts]
-papertrail = "papertrail.cli:main"
+arxit = "arxit.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0",]

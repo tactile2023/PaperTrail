@@ -1,7 +1,6 @@
 import re
 
 
-
 def normalize_arxiv_id(string):
     string = string.strip()
 

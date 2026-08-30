@@ -1,6 +1,6 @@
 from io import BytesIO
 from pypdf import PdfWriter
-from papertrail.pdf_parser import parse_pdf
+from arxit.pdf_parser import parse_pdf
 import pytest
 from pypdf.errors import PdfReadError
 

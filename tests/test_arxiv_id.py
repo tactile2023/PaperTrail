@@ -1,5 +1,5 @@
 import pytest
-from papertrail.arxiv_id import normalize_arxiv_id
+from arxit.arxiv_id import normalize_arxiv_id
 
 
 def test_http_abs_url_is_normalized():

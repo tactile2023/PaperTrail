@@ -1,6 +1,6 @@
 import httpx
 import pytest
-from papertrail.arxiv_client import fetch_arxiv_metadata_xml
+from arxit.arxiv_client import fetch_arxiv_metadata_xml
 
 def test_fetch_arxiv_metadata_xml(monkeypatch):
     expected_xml = "<feed>example response</feed>"
@@ -32,4 +32,3 @@ def test_fetch_raises_for_server_error(monkeypatch):
 
     with pytest.raises(httpx.HTTPStatusError):
         fetch_arxiv_metadata_xml("1706.03762")
-

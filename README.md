@@ -1,9 +1,9 @@
-# PaperTrail
-PaperTrail is an evidence-backed scientific paper integrity auditor for machine-learning papers on arXiv. 
+# arXit
+arXit is an evidence-backed scientific paper integrity auditor for machine-learning papers on arXiv. 
 
 
 ## Motive
-With there being a rise in papers submitted to academic journals, top conferences, and publishings on arXiv with AI slop, PaperTrail was inspired to help readers evaluate papers by identifying potential integrity and reproducibility issues to filter submitted "AI Slop."
+With there being a rise in papers submitted to academic journals, top conferences, and publishings on arXiv with AI slop, arXit was inspired to help readers evaluate papers by identifying potential integrity and reproducibility issues to filter submitted "AI Slop."
 
 ## Planned Capabilities
 - Retrieve and parse arXiv papers
@@ -16,7 +16,7 @@ With there being a rise in papers submitted to academic journals, top conference
 
 
 ## Current Usage
-PaperTrail can:
+arXit can:
 
 - Accept a modern or legacy arXiv identifier or URL
 - Normalize `/abs/`, `/pdf/`, and `/html/` URLs
@@ -33,8 +33,8 @@ PaperTrail can:
 
 ## Installation
 ```bash
-git clone git@github.com:tactile2023/PaperTrail.git
-cd PaperTrail
+git clone git@github.com:tactile2023/arXit.git
+cd arXit
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"

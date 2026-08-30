@@ -1,6 +1,6 @@
 import pytest
 
-from papertrail.arxiv_parser import parse_arxiv_metadata
+from arxit.arxiv_parser import parse_arxiv_metadata
 
 SAMPLE_XML = """
 <feed xmlns="http://www.w3.org/2005/Atom">

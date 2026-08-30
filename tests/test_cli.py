@@ -1,10 +1,10 @@
 import subprocess
 import sys
-import papertrail.cli as cli
-from papertrail.models import ArxivMetadata
+import arxit.cli as cli
+from arxit.models import ArxivMetadata
 import httpx
 import pytest
-from papertrail.models import ArxivMetadata, ParsedPage
+from arxit.models import ArxivMetadata, ParsedPage
 from pypdf.errors import PdfReadError
 
 
@@ -20,7 +20,7 @@ def test_cli_explains_arxiv_rate_limit(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["papertrail", "2507.01019"],
+        ["arxit", "2507.01019"],
     )
 
     with pytest.raises(SystemExit) as error:
@@ -72,7 +72,7 @@ def test_cli_handles_corrup_pdf(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["papertrail", "1706.03762"],
+        ["arxit", "1706.03762"],
     )
 
     with pytest.raises(SystemExit) as error:
@@ -94,7 +94,7 @@ def test_cli_handles_network_errors(monkeypatch, capsys):
         raise httpx.ConnectError("Connection failed")
 
     monkeypatch.setattr(cli, "fetch_arxiv_metadata_xml", fake_fetch)
-    monkeypatch.setattr(sys, "argv", ["papertrail", "1706.03762"])
+    monkeypatch.setattr(sys, "argv", ["arxit", "1706.03762"])
 
     with pytest.raises(SystemExit) as error:
         cli.main()
@@ -140,7 +140,7 @@ def test_cli_displays_metadata(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["papertrail", "https://arxiv.org/abs/2401.12345"],
+        ["arxit", "https://arxiv.org/abs/2401.12345"],
     )
     monkeypatch.setattr(cli, "download_pdf", fake_download)
     monkeypatch.setattr(cli, "parse_pdf", fake_parse_pdf)
@@ -154,12 +154,14 @@ def test_cli_displays_metadata(monkeypatch, capsys):
     assert "Authors: First Author, Second Author" in output
     assert "Pages parsed: 1" in output
     assert "Characters extracted: 18" in output
+    assert "Sections found: 0" in output
+    assert "References found: 0" in output
     
 
 
 def test_cli_rejects_invalid_input_without_traceback():
     result = subprocess.run(
-        ["papertrail", "invalid_input"],
+        ["arxit", "invalid_input"],
         capture_output=True,
         text=True,
         check=False,

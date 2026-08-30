@@ -13,3 +13,6 @@ __pycache__/
 # Local secrets and macOS files
 .env
 .DS_Store
+
+
+*.egg-info/

@@ -8,6 +8,8 @@ from pypdf.errors import PdfReadError
 from .models import ParsedPaper
 from .pdf_downloader import download_pdf
 from .pdf_parser import parse_pdf
+from .section_extractor import extract_sections
+from .reference_extractor import extract_references
 
 
 
@@ -17,7 +19,7 @@ from .pdf_parser import parse_pdf
 
 def build_parser():
     parser = argparse.ArgumentParser(
-        prog="papertrail",
+        prog="arxit",
         description="Audit machine-learning papers on arXiv.",
     )
 
@@ -37,8 +39,19 @@ def main():
 
         pdf_bytes = download_pdf(metadata.pdf_url)
         pages = parse_pdf(pdf_bytes)
+        sections = extract_sections(pages)
 
-        paper = ParsedPaper(metadata=metadata, pages=pages)
+        
+
+
+        references = extract_references(sections)
+
+        paper = ParsedPaper(
+            metadata=metadata,
+            pages=pages,
+            sections=sections,
+            references=references
+        )
 
     except ValueError as e:
         parser.error(str(e))
@@ -60,6 +73,8 @@ def main():
 
     character_count = sum(len(page.text) for page in paper.pages)
 
+
+
         
     print(f"arXiv ID: {metadata.arxiv_id}")
     print(f"Title: {metadata.title}")
@@ -68,3 +83,20 @@ def main():
     print(f"PDF: {metadata.pdf_url}")
     print(f"Pages parsed: {len(paper.pages)}")
     print(f"Characters extracted: {character_count}")
+    print(f"Sections found: {len(paper.sections)}")
+
+    for section in paper.sections:
+        print(
+            f"  {section.title} "
+            f"(pages {section.start_page}-{section.end_page})"
+        )
+
+    print(f"References found: {len(paper.references)}")
+
+    for reference in paper.references:
+        if reference.label is not None:
+            prefix = f"[{reference.label}]"
+        else:
+            prefix = "-"
+
+        print(f"  {prefix} {reference.raw_text}")
