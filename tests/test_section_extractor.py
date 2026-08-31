@@ -1,6 +1,51 @@
 from arxit.models import ParsedPage
 from arxit.section_extractor import extract_sections
 
+def test_extract_sections_finds_lettered_appendix_titles():
+    pages = [
+        ParsedPage(
+            page_number=9,
+            text=(
+                "References\n"
+                "[50] K. Simonyan and A. Zisserman. "
+                "Very deep convolutional networks."
+            ),
+        ),
+        ParsedPage(
+            page_number=10,
+            text=(
+                "A. Object Detection Baselines\n"
+                "Our detection method is based on Faster R-CNN [32].\n"
+                "The experiment continues here."
+            ),
+        ),
+        ParsedPage(
+            page_number=11,
+            text=(
+                "B. Object Detection on COCO\n"
+                "We evaluated the model on the COCO dataset."
+            ),
+        ),
+    ]
+
+    sections = extract_sections(pages)
+
+    assert [section.title for section in sections] == [
+        "References",
+        "Appendix A: Object Detection Baselines",
+        "Appendix B: Object Detection on COCO",
+    ]
+
+    assert sections[0].text == (
+        "[50] K. Simonyan and A. Zisserman. "
+        "Very deep convolutional networks."
+    )
+
+    assert "[32]" in sections[1].text
+    assert "[32]" not in sections[0].text
+
+
+    
 
 def test_extract_sections_finds_lettered_appendix_headings():
     pages = [
@@ -136,3 +181,30 @@ def test_extract_sections_finds_headings():
         "Methods",
         "References"
     ]
+
+
+
+
+def test_does_not_treat_author_initial_as_appendix():
+    pages = [
+        ParsedPage(
+            page_number=9,
+            text=(
+                "References\n"
+                "[14] G. Hinton, A. Krizhevsky, and\n"
+                "R. Salakhutdinov. Improving neural networks by "
+                "preventing co-adaptation.\n"
+                "[15] S. Hochreiter and J. Schmidhuber. "
+                "Long short-term memory."
+            ),
+        )
+    ]
+
+    sections = extract_sections(pages)
+
+    assert [section.title for section in sections] == [
+        "References",
+    ]
+
+    assert "R. Salakhutdinov" in sections[0].text
+    assert "[15]" in sections[0].text

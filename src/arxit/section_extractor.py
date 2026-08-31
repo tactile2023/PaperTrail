@@ -17,6 +17,10 @@ APPENDIX_SUBHEADING_PATTERN = re.compile(
     r"^[A-Z]\.\d{1,2}(?:\.\d{1,2})*\.?\s+(.+)$"
 )
 
+LETTERED_APPENDIX_TITLE_PATTERN = re.compile(
+    r"^([A-Z])\.\s+(.+)$"
+)
+
 KNOWN_HEADINGS = {
     "abstract",
     "references",
@@ -29,7 +33,7 @@ KNOWN_HEADINGS = {
 }
 
 
-def find_heading_title(line):
+def find_heading_title(line, current_title=None):
     if line.lower() in KNOWN_HEADINGS:
         return line.title()
 
@@ -48,6 +52,61 @@ def find_heading_title(line):
             title = f"{title}: {description.strip()}"
 
         return title
+
+
+    lettered_appendix_match = (
+    LETTERED_APPENDIX_TITLE_PATTERN.match(line)
+)
+
+    if lettered_appendix_match and current_title is not None:
+        letter = lettered_appendix_match.group(1)
+        candidate = (
+            lettered_appendix_match.group(2).strip()
+        )
+
+        current_title_lower = current_title.lower()
+        expected_letter = None
+
+        if current_title_lower in {
+            "references",
+            "bibliography",
+        }:
+            expected_letter = "A"
+
+        else:
+            previous_appendix_match = re.match(
+                r"^appendix\s+([A-Z])(?:\s*:|$)",
+                current_title,
+                re.IGNORECASE,
+            )
+
+            if previous_appendix_match:
+                previous_letter = (
+                    previous_appendix_match
+                    .group(1)
+                    .upper()
+                )
+
+                if previous_letter != "Z":
+                    expected_letter = chr(
+                        ord(previous_letter) + 1
+                    )
+
+        looks_like_title = (
+            candidate
+            and candidate[0].isupper()
+            and not candidate.endswith((".", "?", "!"))
+            and "," not in candidate
+            and re.search(
+                r"\b(?:19|20)\d{2}\b",
+                candidate,
+            )
+            is None
+            and len(candidate.split()) <= 12
+        )
+
+        if letter == expected_letter and looks_like_title:
+            return f"Appendix {letter}: {candidate}"
 
     appendix_subheading_match = APPENDIX_SUBHEADING_PATTERN.match(line)
 
@@ -108,7 +167,7 @@ def extract_sections(pages):
             if not line:
                 continue
 
-            heading_title = find_heading_title(line)
+            heading_title = find_heading_title(line, current_title)
 
             if heading_title is not None:
                 if current_title is not None:

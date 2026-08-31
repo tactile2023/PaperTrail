@@ -1,0 +1,40 @@
+arXiv ID: 1512.03385v1
+Title: Deep Residual Learning for Image Recognition
+Authors: Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun
+Published: 2015-12-10T19:51:55Z
+PDF: https://arxiv.org/pdf/1512.03385v1
+Pages parsed: 12
+Characters extracted: 59415
+Sections found: 17
+  Abstract (pages 1-1)
+  Introduction (pages 1-2)
+  Related Work (pages 2-3)
+  Deep Residual Learning (pages 3-3)
+  Residual Learning (pages 3-3)
+  Identity Mapping by Shortcuts (pages 3-3)
+  Network Architectures (pages 3-4)
+  Implementation (pages 4-4)
+  Experiments (pages 4-4)
+  ImageNet Classiﬁcation (pages 4-7)
+  CIFAR-10 and Analysis (pages 7-8)
+  Object Detection on PASCAL and MS COCO (pages 8-8)
+  References (pages 9-9)
+  Appendix R: R. Salakhutdinov. Improving neural networks by preventing co- (pages 9-9)
+  Appendix A: Object Detection Baselines (pages 10-10)
+  Appendix B: Object Detection Improvements (pages 10-12)
+  Appendix C: ImageNet Localization (pages 12-12)
+References found: 14
+  [1] Y . Bengio, P. Simard, and P. Frasconi. Learning long-term dependen- cies with gradient descent is difﬁcult. IEEE Transactions on Neural Networks, 5(2):157–166, 1994.
+  [2] C. M. Bishop. Neural networks for pattern recognition . Oxford university press, 1995.
+  [3] W. L. Briggs, S. F. McCormick, et al. A Multigrid Tutorial. Siam, 2000.
+  [4] K. Chatﬁeld, V . Lempitsky, A. Vedaldi, and A. Zisserman. The devil is in the details: an evaluation of recent feature encoding methods. In BMVC, 2011.
+  [5] M. Everingham, L. Van Gool, C. K. Williams, J. Winn, and A. Zis- serman. The Pascal Visual Object Classes (VOC) Challenge. IJCV, pages 303–338, 2010.
+  [6] S. Gidaris and N. Komodakis. Object detection via a multi-region & semantic segmentation-aware cnn model. In ICCV, 2015.
+  [7] R. Girshick. Fast R-CNN. In ICCV, 2015.
+  [8] R. Girshick, J. Donahue, T. Darrell, and J. Malik. Rich feature hier- archies for accurate object detection and semantic segmentation. In CVPR, 2014.
+  [9] X. Glorot and Y . Bengio. Understanding the difﬁculty of training deep feedforward neural networks. In AISTATS, 2010.
+  [10] I. J. Goodfellow, D. Warde-Farley, M. Mirza, A. Courville, and Y . Bengio. Maxout networks.arXiv:1302.4389, 2013.
+  [11] K. He and J. Sun. Convolutional neural networks at constrained time cost. In CVPR, 2015.
+  [12] K. He, X. Zhang, S. Ren, and J. Sun. Spatial pyramid pooling in deep convolutional networks for visual recognition. In ECCV, 2014.
+  [13] K. He, X. Zhang, S. Ren, and J. Sun. Delving deep into rectiﬁers: Surpassing human-level performance on imagenet classiﬁcation. In ICCV, 2015.
+  [14] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and
