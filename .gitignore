@@ -16,3 +16,6 @@ __pycache__/
 
 
 *.egg-info/
+
+# Ignore sample outputs
+*-output*.txt
