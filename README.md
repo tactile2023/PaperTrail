@@ -18,17 +18,14 @@ With there being a rise in papers submitted to academic journals, top conference
 ## Current Usage
 arXit can:
 
-- Accept a modern or legacy arXiv identifier or URL
-- Normalize `/abs/`, `/pdf/`, and `/html/` URLs
+- Normalize a modern or legacy arXiv identifier or URL
 - Retrieve metadata from the arXiv API
 - Extract the paper ID, title, summary, authors, dates, categories, and PDF URL
-- Handle invalid identifiers, missing papers, missing PDF links, and network errors
-- Run automated tests without depending on a live internet connection
-- Download the paper pDF from arXiv
-- Validate downloaded PDF content and extract text page by page
-- Preserve page numbers for future tracking
-- Report page and character counts
-- Handle invalid and corrupted PDF responses
+- Extract and detect numbered sections and subsectoins
+- Extract numbered/unnumbered references
+- Report network, metadata, download, and PDF parsing errors
+
+Academic PDF formatting varies, so unusual layouts may require additional rules. 
 
 
 ## Installation
