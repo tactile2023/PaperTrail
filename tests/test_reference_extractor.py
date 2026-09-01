@@ -2,6 +2,18 @@ from arxit.models import PaperSection
 from arxit.reference_extractor import extract_references, extract_numbered_references, extract_author_year_references
 
 
+def test_reference_includes_extracted_url():
+    lines = [
+        "[1] Example Author. Example Dataset. "
+        "https://example.org/dataset."
+    ]
+
+    references = extract_numbered_references(lines)
+    assert references[0].url == "https://example.org/dataset"
+
+
+
+
 def test_reference_includes_extracted_doi():
     lines = [
         "[1] Example Author. Example Paper. "

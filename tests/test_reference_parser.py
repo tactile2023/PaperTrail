@@ -1,5 +1,40 @@
 from arxit.reference_parser import (
-    extract_arxiv_id, extract_year, extract_doi)
+    extract_arxiv_id, extract_year, extract_doi, extract_url)
+
+
+def test_extract_url():
+    raw_text = (
+        "Example project. Code available at "
+        "https://github.com/example/project"
+    )
+
+    assert extract_url(raw_text) == "https://github.com/example/project"
+
+
+def test_extract_url_removes_trailing_punctuation():
+    raw_text = (
+        "Dataset available at "
+        "https://example.org/dataset."
+    )
+
+    assert extract_url(raw_text) == "https://example.org/dataset"
+
+
+def test_extract_url_with_path_and_query():
+    raw_text = (
+        "See https://example.org/search?q=machine-learning&year=2024"
+    )
+
+    assert extract_url(raw_text) == (
+        "https://example.org/search?q=machine-learning&year=2024"
+    )
+
+
+def test_extract_url_returns_none_when_missing():
+    raw_text = "Example Author. Example Paper. 2024."
+
+    assert extract_url(raw_text) is None
+
 
 
 def test_extract_doi_with_label():

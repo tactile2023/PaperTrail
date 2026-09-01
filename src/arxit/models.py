@@ -19,6 +19,7 @@ class Reference:
     year: int | None = None
     arxiv_id: str | None = None
     doi: str | None = None
+    url: str | None = None
 
 
 @dataclass

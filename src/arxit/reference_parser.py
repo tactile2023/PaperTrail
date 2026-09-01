@@ -22,6 +22,20 @@ DOI_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+URL_PATTERN = re.compile(
+    r'https?://[^\s<>"\']+',
+    re.IGNORECASE,
+)
+
+
+def extract_url(raw_text: str) -> str | None:
+    match = URL_PATTERN.search(raw_text)
+
+    if match is None:
+        return None
+
+    return match.group(0).rstrip(".,;:")
+
 
 def extract_doi(raw_text: str) -> str | None:
     match = DOI_PATTERN.search(raw_text)
