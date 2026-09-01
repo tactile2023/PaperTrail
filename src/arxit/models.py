@@ -16,6 +16,7 @@ class ArxivMetadata:
 class Reference:
     label: str | None
     raw_text: str
+    year: int | None = None
 
 
 @dataclass

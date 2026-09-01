@@ -1,5 +1,8 @@
 from arxit.models import PaperSection
-from arxit.reference_extractor import extract_references
+from arxit.reference_extractor import extract_references 
+from arxit.reference_extractor import extract_numbered_references
+from arxit.reference_extractor import extract_author_year_references
+
 
 def test_extract_references_when_year_starts_next_line():
     sections = [
@@ -166,3 +169,26 @@ def test_extract_references_with_wrapped_author_list():
         "multiagent systems. Preprint, arXiv:2501.14844."
     )
 
+
+
+def test_numbered_reference_includes_extracted_year():
+    lines = [
+        "[1] K. He, X. Zhang, S. Ren, and J. Sun. "
+        "Deep residual learning. 2016."
+    ]
+
+    references = extract_numbered_references(lines)
+    assert references[0].year == 2016
+
+
+
+
+def test_author_year_reference_includes_extracted_year():
+    lines = [
+        "Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K. "
+        "2019. BERT: Pre-training of deep bidirectional transformers."
+    ]
+
+    references = extract_author_year_references(lines)
+
+    assert references[0].year == 2019
