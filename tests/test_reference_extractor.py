@@ -1,7 +1,17 @@
 from arxit.models import PaperSection
-from arxit.reference_extractor import extract_references 
-from arxit.reference_extractor import extract_numbered_references
-from arxit.reference_extractor import extract_author_year_references
+from arxit.reference_extractor import extract_references, extract_numbered_references, extract_author_year_references
+
+
+
+def test_reference_includes_extracted_arxiv_id():
+    lines = [
+        "[10] I. J. Goodfellow et al. "
+        "Maxout Networks. arXiv: 1302.4389, 2013."
+    ]
+
+    references = extract_numbered_references(lines)
+    assert references[0].arxiv_id == "1302.4389"
+
 
 
 def test_extract_references_when_year_starts_next_line():

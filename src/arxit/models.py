@@ -17,6 +17,7 @@ class Reference:
     label: str | None
     raw_text: str
     year: int | None = None
+    arxiv_id: str | None = None
 
 
 @dataclass
