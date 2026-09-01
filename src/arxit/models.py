@@ -43,3 +43,11 @@ class ParsedPaper:
     pages: list[ParsedPage]
     sections: list[PaperSection]
     references: list[Reference]
+
+
+
+
+@dataclass
+class ArxivCitationResult:
+    reference: Reference
+    metadata: ArxivMetadata | None

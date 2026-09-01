@@ -1,0 +1,77 @@
+from .models import Reference
+import re
+from .arxiv_client import (fetch_arxiv_metadata_batch_xml)
+from .arxiv_parser import (parse_arxiv_metadata_batch)
+
+from .models import ArxivMetadata, Reference, ArxivCitationResult
+
+
+def remove_arxiv_version(arxiv_id: str) -> str:
+    return re.sub(
+        r"v\d+$",
+        "",
+        arxiv_id,
+        flags=re.IGNORECASE,
+    )
+
+
+def match_reference_metadata(
+    references: list[Reference],
+    metadata_items: list[ArxivMetadata],
+) -> list[ArxivCitationResult]:
+    metadata_by_id = {
+        remove_arxiv_version(metadata.arxiv_id):
+        metadata
+        for metadata in metadata_items
+    }
+
+    results = []
+
+    for reference in references:
+        if reference.arxiv_id is None:
+            continue
+
+        base_id = remove_arxiv_version(
+            reference.arxiv_id
+        )
+
+        results.append(
+            ArxivCitationResult(
+                reference=reference,
+                metadata=metadata_by_id.get(base_id),
+            )
+        )
+
+    return results
+
+
+def verify_arxiv_references(references: list[Reference]) -> list[ArxivCitationResult]:
+    metadata_items = fetch_reference_metadata(references)
+
+    return match_reference_metadata(references, metadata_items)
+
+
+
+def collect_unique_arxiv_ids(references: list[Reference]) -> list[str]:
+    unique_ids = []
+    seen_ids = set()
+
+    for reference in references:
+        arxiv_id = reference.arxiv_id
+
+        if(arxiv_id is not None and arxiv_id not in seen_ids):
+            unique_ids.append(arxiv_id)
+            seen_ids.add(arxiv_id)
+
+    return unique_ids
+
+
+def fetch_reference_metadata(references: list[Reference]) -> list[ArxivMetadata]:
+    arxiv_ids = collect_unique_arxiv_ids(references)
+
+    if not arxiv_ids: 
+        return []
+
+    xml_text = fetch_arxiv_metadata_batch_xml(arxiv_ids)
+
+    return parse_arxiv_metadata_batch(xml_text)
