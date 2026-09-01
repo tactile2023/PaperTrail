@@ -2,6 +2,15 @@ from arxit.models import PaperSection
 from arxit.reference_extractor import extract_references, extract_numbered_references, extract_author_year_references
 
 
+def test_reference_includes_extracted_doi():
+    lines = [
+        "[1] Example Author. Example Paper. "
+        "doi:10.1038/s41586-021-03819-2."
+    ]
+
+    references = extract_numbered_references(lines)
+    assert references[0].doi == "10.1038/s41586-021-03819-2"
+
 
 def test_reference_includes_extracted_arxiv_id():
     lines = [

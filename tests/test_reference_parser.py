@@ -1,4 +1,42 @@
-from arxit.reference_parser import extract_arxiv_id, extract_year
+from arxit.reference_parser import (
+    extract_arxiv_id, extract_year, extract_doi)
+
+
+def test_extract_doi_with_label():
+    raw_text = (
+        "Vasista et al. Exoplanet Research. "
+        "doi:10.13021/MARS/15158."
+    )
+
+    assert extract_doi(raw_text) == "10.13021/mars/15158"
+
+
+def test_extract_doi_from_url():
+    raw_text = (
+        "Example paper. "
+        "https://doi.org/10.1038/s41586-021-03819-2"
+    )
+
+    assert extract_doi(raw_text) == "10.1038/s41586-021-03819-2"
+
+
+def test_extract_doi_without_label():
+    raw_text = "Example paper. 10.1145/3290605.3300233."
+
+    assert extract_doi(raw_text) == "10.1145/3290605.3300233"
+
+
+def test_extract_doi_removes_trailing_punctuation():
+    raw_text = "Available at doi:10.1000/example.123,"
+
+    assert extract_doi(raw_text) == "10.1000/example.123"
+
+
+def test_extract_doi_returns_none_when_missing():
+    raw_text = "Example Author. Example Paper. 2024."
+
+    assert extract_doi(raw_text) is None
+
 
 
 def test_extract_year_from_reference():

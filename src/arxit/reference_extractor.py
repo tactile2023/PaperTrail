@@ -1,5 +1,5 @@
 import re
-from .reference_parser import extract_year, extract_arxiv_id
+from .reference_parser import (extract_year, extract_arxiv_id, extract_doi)
 from .models import Reference
 
 
@@ -22,7 +22,8 @@ def build_reference(label, raw_text):
         label=label,
         raw_text=raw_text,
         year=extract_year(raw_text),
-        arxiv_id = extract_arxiv_id(raw_text)
+        arxiv_id = extract_arxiv_id(raw_text),
+        doi = extract_doi(raw_text)
     )
     
 

@@ -18,6 +18,7 @@ class Reference:
     raw_text: str
     year: int | None = None
     arxiv_id: str | None = None
+    doi: str | None = None
 
 
 @dataclass
