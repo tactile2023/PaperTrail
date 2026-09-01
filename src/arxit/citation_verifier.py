@@ -3,7 +3,33 @@ import re
 from .arxiv_client import (fetch_arxiv_metadata_batch_xml)
 from .arxiv_parser import (parse_arxiv_metadata_batch)
 
-from .models import ArxivMetadata, Reference, ArxivCitationResult
+from .models import ArxivMetadata, Reference, ArxivCitationResult, Finding
+
+
+def find_unresolved_arxiv_citations(
+    results: list[ArxivCitationResult]) -> list[Finding]:
+    findings = []
+
+    for result in results:
+        if result.metadata is None:
+            arxiv_id = result.reference.arxiv_id
+
+            findings.append(
+                Finding(
+                    finding_type=(
+                        "unresolved_arxiv_citation"
+                    ),
+                    message=(
+                        f"arXiv ID {arxiv_id} "
+                        "could not be resolved."
+                    ),
+                    reference=result.reference,
+                )
+            )
+
+    return findings
+
+
 
 
 def remove_arxiv_version(arxiv_id: str) -> str:

@@ -51,3 +51,10 @@ class ParsedPaper:
 class ArxivCitationResult:
     reference: Reference
     metadata: ArxivMetadata | None
+
+
+@dataclass
+class Finding: 
+    finding_type: str
+    message: str
+    reference: Reference

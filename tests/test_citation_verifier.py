@@ -1,11 +1,76 @@
 from arxit.citation_verifier import (
     collect_unique_arxiv_ids,
 )
-from arxit.models import Reference, ArxivMetadata
+from arxit.models import Reference, ArxivMetadata, ArxivCitationResult
 import arxit.citation_verifier as verifier
 
 
-from arxit.citation_verifier import (collect_unique_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata)
+from arxit.citation_verifier import (collect_unique_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata, find_unresolved_arxiv_citations)
+
+
+
+def test_find_unresolved_arxiv_citations():
+    unresolved_reference = Reference(
+        label="12",
+        raw_text=(
+            "Example Author. Unknown Paper. "
+            "arXiv:9999.99999."
+        ),
+        arxiv_id="9999.99999",
+    )
+
+    results = [
+        ArxivCitationResult(
+            reference=unresolved_reference,
+            metadata=None,
+        )
+    ]
+
+    findings = find_unresolved_arxiv_citations(
+        results
+    )
+
+    assert len(findings) == 1
+    assert findings[0].finding_type == (
+        "unresolved_arxiv_citation"
+    )
+    assert findings[0].message == (
+        "arXiv ID 9999.99999 could not be resolved."
+    )
+    assert findings[0].reference == (
+        unresolved_reference
+    )
+
+
+def test_resolved_arxiv_citation_creates_no_finding():
+    reference = Reference(
+        label="1",
+        raw_text="Attention paper.",
+        arxiv_id="1706.03762",
+    )
+
+    metadata = ArxivMetadata(
+        title="Attention Is All You Need",
+        summary="A Transformer architecture.",
+        authors=["Ashish Vaswani"],
+        published="2017-06-12T17:57:34Z",
+        updated="2023-08-02T00:41:18Z",
+        categories=["cs.CL"],
+        arxiv_id="1706.03762v7",
+        pdf_url="https://arxiv.org/pdf/1706.03762v7",
+    )
+
+    results = [
+        ArxivCitationResult(
+            reference=reference,
+            metadata=metadata,
+        )
+    ]
+
+    assert find_unresolved_arxiv_citations(results) == []
+
+
+
 
 
 def test_verify_arxiv_references(
