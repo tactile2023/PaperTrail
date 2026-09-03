@@ -4,7 +4,7 @@ import arxit.cli as cli
 from arxit.models import ArxivMetadata
 import httpx
 import pytest
-from arxit.models import ArxivMetadata, ParsedPage
+from arxit.models import ArxivMetadata, ParsedPage, Finding, Reference
 from pypdf.errors import PdfReadError
 
 
@@ -135,6 +135,18 @@ def test_cli_displays_metadata(monkeypatch, capsys):
     
         return[ParsedPage(page_number=1, text="Example paper text")]
 
+
+    reference = Reference(
+        label="7",
+        raw_text="Unknown paper. arXiv: 2401.99999.",
+        arxiv_id="2401.99999"
+    )
+
+    finding = Finding(finding_type="unresolved_arxiv_citation",
+                      message=("arXiv ID 2401.99999 could not be resolved."),
+                      reference=reference)
+
+
     monkeypatch.setattr(cli, "fetch_arxiv_metadata_xml", fake_fetch)
     monkeypatch.setattr(cli, "parse_arxiv_metadata", fake_parse)
     monkeypatch.setattr(
@@ -144,6 +156,8 @@ def test_cli_displays_metadata(monkeypatch, capsys):
     )
     monkeypatch.setattr(cli, "download_pdf", fake_download)
     monkeypatch.setattr(cli, "parse_pdf", fake_parse_pdf)
+    monkeypatch.setattr(cli, "extract_references", lambda sections:[reference])
+    monkeypatch.setattr(cli, "audit_arxiv_citations", lambda references: [finding])
 
     cli.main()
 
@@ -155,7 +169,9 @@ def test_cli_displays_metadata(monkeypatch, capsys):
     assert "Pages parsed: 1" in output
     assert "Characters extracted: 18" in output
     assert "Sections found: 0" in output
-    assert "References found: 0" in output
+    assert "References found: 1" in output
+    assert "Citation findings: 1" in output
+    assert "arXiv ID 2401.99999 could not be resolved." in output
     
 
 

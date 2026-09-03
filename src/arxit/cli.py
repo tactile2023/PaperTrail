@@ -10,6 +10,7 @@ from .pdf_downloader import download_pdf
 from .pdf_parser import parse_pdf
 from .section_extractor import extract_sections
 from .reference_extractor import extract_references
+from .citation_verifier import audit_arxiv_citations
 
 
 
@@ -52,6 +53,7 @@ def main():
             sections=sections,
             references=references
         )
+        citation_findings = (audit_arxiv_citations(paper.references))
 
     except ValueError as e:
         parser.error(str(e))
@@ -100,3 +102,15 @@ def main():
             prefix = "-"
 
         print(f"  {prefix} {reference.raw_text}")
+
+
+    print(
+        f"Citation findings: "
+        f"{len(citation_findings)}")
+
+    for finding in citation_findings:
+        print(
+            f"  [{finding.finding_type}] "
+            f"{finding.message}"
+        ) 
+

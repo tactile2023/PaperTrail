@@ -10,7 +10,8 @@ def test_fetch_arxiv_metadata_batch_xml(monkeypatch):
     def fake_get(url, params, timeout):
         assert url == "https://export.arxiv.org/api/query"
         assert params == {
-            "id_list": "1302.4389,1706.03762,1810.04805"
+            "id_list": "1302.4389,1706.03762,1810.04805",
+            "max_results": 3
         }
         assert timeout == 30.0
 
@@ -51,7 +52,7 @@ def test_fetch_arxiv_metadata_xml(monkeypatch):
 
     def fake_get(url, params, timeout):
         assert url == "https://export.arxiv.org/api/query"
-        assert params == {"id_list": "1706.03762"}
+        assert params == {"id_list": "1706.03762", "max_results": 1}
         assert timeout == 30.0
 
         request = httpx.Request("GET", url)

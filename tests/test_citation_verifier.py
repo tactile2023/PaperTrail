@@ -5,7 +5,56 @@ from arxit.models import Reference, ArxivMetadata, ArxivCitationResult
 import arxit.citation_verifier as verifier
 
 
-from arxit.citation_verifier import (collect_unique_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata, find_unresolved_arxiv_citations, find_year_mismatches)
+from arxit.citation_verifier import (collect_unique_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata, find_unresolved_arxiv_citations, find_year_mismatches, audit_arxiv_citations)
+
+def test_audit_arxiv_citations_combines_findings(monkeypatch):
+    unresolved_reference = Reference(
+        label="1",
+        raw_text="Unknown paper.",
+        arxiv_id="1706.99999",
+    )
+
+    wrong_year_reference = Reference(
+        label="2",
+        raw_text="Attention paper. 2019.",
+        year=2019,
+        arxiv_id="1706.03762",
+    )
+
+    metadata = ArxivMetadata(
+        title="Attention Is All You Need",
+        summary="A Transformer architecture.",
+        authors=["Ashish Vaswani"],
+        published="2017-06-12T17:57:34Z",
+        updated="2023-08-02T00:41:18Z",
+        categories=["cs.CL"],
+        arxiv_id="1706.03762v7",
+        pdf_url="https://arxiv.org/pdf/1706.03762v7",
+    )
+
+    results = [
+        ArxivCitationResult(
+            reference=unresolved_reference,
+            metadata=None,
+        ),
+        ArxivCitationResult(
+            reference=wrong_year_reference,
+            metadata=metadata,
+        ),
+    ]
+
+    monkeypatch.setattr(
+        verifier,
+        "verify_arxiv_references",
+        lambda references: results,
+    )
+
+    findings = audit_arxiv_citations([unresolved_reference, wrong_year_reference])
+
+    assert [finding.finding_type for finding in findings] == [
+        "unresolved_arxiv_citation",
+        "arxiv_year_mismatch",
+    ]
 
 
 

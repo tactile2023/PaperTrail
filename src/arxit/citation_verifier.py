@@ -6,6 +6,16 @@ from .arxiv_parser import (parse_arxiv_metadata_batch)
 from .models import ArxivMetadata, Reference, ArxivCitationResult, Finding
 
 
+def audit_arxiv_citations(references: list[Reference]) -> list[Finding]:
+    results = verify_arxiv_references(references)
+
+    findings = find_unresolved_arxiv_citations(results) + find_year_mismatches(results)
+
+    return findings
+
+
+
+
 def find_year_mismatches(results: list[ArxivCitationResult]) -> list[Finding]:
     findings = []
 
