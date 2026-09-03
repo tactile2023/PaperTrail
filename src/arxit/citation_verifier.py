@@ -6,6 +6,40 @@ from .arxiv_parser import (parse_arxiv_metadata_batch)
 from .models import ArxivMetadata, Reference, ArxivCitationResult, Finding
 
 
+def find_year_mismatches(results: list[ArxivCitationResult]) -> list[Finding]:
+    findings = []
+
+    for result in results:
+        reference = result.reference
+        metadata = result.metadata
+
+        if (metadata is None or reference.year is None):
+            continue
+
+        authoritative_year = int(metadata.published[:4])
+
+        if reference.year != authoritative_year:
+            label = reference.label or "unlabeled"
+
+            findings.append(
+                Finding(
+                    finding_type=(
+                        "arxiv_year_mismatch"
+                    ),
+                    message=(
+                        f"Reference {label} cites arXiv ID "
+                        f"{reference.arxiv_id} as "
+                        f"{reference.year}, but arXiv "
+                        f"reports {authoritative_year}."
+                    ),
+                    reference=reference,
+                )
+            )
+
+    return findings
+
+
+
 def find_unresolved_arxiv_citations(
     results: list[ArxivCitationResult]) -> list[Finding]:
     findings = []

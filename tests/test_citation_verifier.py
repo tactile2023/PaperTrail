@@ -5,7 +5,52 @@ from arxit.models import Reference, ArxivMetadata, ArxivCitationResult
 import arxit.citation_verifier as verifier
 
 
-from arxit.citation_verifier import (collect_unique_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata, find_unresolved_arxiv_citations)
+from arxit.citation_verifier import (collect_unique_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata, find_unresolved_arxiv_citations, find_year_mismatches)
+
+
+
+def test_find_year_mismatch():
+    reference = Reference(
+        label="5",
+        raw_text=(
+            "Vaswani et al. Attention Is All You Need. "
+            "arXiv:1706.03762, 2019."
+        ),
+        year=2019,
+        arxiv_id="1706.03762",
+    )
+
+    metadata = ArxivMetadata(
+        title="Attention Is All You Need",
+        summary="A Transformer architecture.",
+        authors=["Ashish Vaswani"],
+        published="2017-06-12T17:57:34Z",
+        updated="2023-08-02T00:41:18Z",
+        categories=["cs.CL"],
+        arxiv_id="1706.03762v7",
+        pdf_url="https://arxiv.org/pdf/1706.03762v7",
+    )
+
+    results = [
+        ArxivCitationResult(
+            reference=reference,
+            metadata=metadata,
+        )
+    ]
+
+    findings = find_year_mismatches(results)
+
+    assert len(findings) == 1
+    assert findings[0].finding_type == (
+        "arxiv_year_mismatch"
+    )
+    assert findings[0].message == (
+        "Reference 5 cites arXiv ID 1706.03762 "
+        "as 2019, but arXiv reports 2017."
+    )
+    assert findings[0].reference == reference
+
+
 
 
 
@@ -40,6 +85,40 @@ def test_find_unresolved_arxiv_citations():
     assert findings[0].reference == (
         unresolved_reference
     )
+
+
+def test_matching_year_creates_no_finding():
+    reference = Reference(
+        label="5",
+        raw_text=(
+            "Vaswani et al. Attention Is All You Need. "
+            "arXiv:1706.03762, 2017."
+        ),
+        year=2017,
+        arxiv_id="1706.03762",
+    )
+
+    metadata = ArxivMetadata(
+        title="Attention Is All You Need",
+        summary="A Transformer architecture.",
+        authors=["Ashish Vaswani"],
+        published="2017-06-12T17:57:34Z",
+        updated="2023-08-02T00:41:18Z",
+        categories=["cs.CL"],
+        arxiv_id="1706.03762v7",
+        pdf_url="https://arxiv.org/pdf/1706.03762v7",
+    )
+
+    results = [
+        ArxivCitationResult(
+            reference=reference,
+            metadata=metadata,
+        )
+    ]
+
+    assert find_year_mismatches(results) == []
+
+    
 
 
 def test_resolved_arxiv_citation_creates_no_finding():
