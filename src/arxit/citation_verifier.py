@@ -6,6 +6,21 @@ from .arxiv_parser import (parse_arxiv_metadata_batch)
 from .models import ArxivMetadata, Reference, ArxivCitationResult, Finding
 
 
+DEFAULT_ARXIV_BATCH_SIZE = 50
+
+
+def chunk_arxiv_ids(arxiv_ids: list[str], batch_size: int = DEFAULT_ARXIV_BATCH_SIZE) -> list[list[str]]:
+    if batch_size <= 0:
+        raise ValueError("Batch size must be positive")
+
+
+    return [arxiv_ids[index:index + batch_size]
+        for index in range(0, len(arxiv_ids), batch_size)
+
+            ]
+
+
+
 def audit_arxiv_citations(references: list[Reference]) -> list[Finding]:
     results = verify_arxiv_references(references)
 
@@ -136,12 +151,17 @@ def collect_unique_arxiv_ids(references: list[Reference]) -> list[str]:
     return unique_ids
 
 
-def fetch_reference_metadata(references: list[Reference]) -> list[ArxivMetadata]:
+def fetch_reference_metadata(references: list[Reference], batch_size: int = DEFAULT_ARXIV_BATCH_SIZE) -> list[ArxivMetadata]:
     arxiv_ids = collect_unique_arxiv_ids(references)
 
-    if not arxiv_ids: 
+    if not arxiv_ids:
         return []
 
-    xml_text = fetch_arxiv_metadata_batch_xml(arxiv_ids)
+    metadata_items = []
 
-    return parse_arxiv_metadata_batch(xml_text)
+    for batch in chunk_arxiv_ids(arxiv_ids,batch_size=batch_size):
+        xml_text = (fetch_arxiv_metadata_batch_xml(batch))
+        batch_metadata = (parse_arxiv_metadata_batch(xml_text))
+        metadata_items.extend(batch_metadata)
+
+    return metadata_items

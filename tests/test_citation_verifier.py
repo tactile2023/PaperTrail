@@ -3,9 +3,84 @@ from arxit.citation_verifier import (
 )
 from arxit.models import Reference, ArxivMetadata, ArxivCitationResult
 import arxit.citation_verifier as verifier
+import pytest
+
+from arxit.citation_verifier import (collect_unique_arxiv_ids, chunk_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata, find_unresolved_arxiv_citations, find_year_mismatches, audit_arxiv_citations)
 
 
-from arxit.citation_verifier import (collect_unique_arxiv_ids, fetch_reference_metadata, verify_arxiv_references, match_reference_metadata, find_unresolved_arxiv_citations, find_year_mismatches, audit_arxiv_citations)
+
+def test_fetch_reference_metadata_uses_chunks(monkeypatch):
+    references = [
+        Reference(
+            label=str(index),
+            raw_text=f"Paper {index}.",
+            arxiv_id=f"2401.{index:05d}",
+        )
+        for index in range(1, 6)
+    ]
+
+    requested_batches = []
+
+    def fake_fetch(arxiv_ids):
+        requested_batches.append(arxiv_ids)
+        return ",".join(arxiv_ids)
+
+    def fake_parse(xml_text):
+        return [
+            f"metadata:{arxiv_id}"
+            for arxiv_id in xml_text.split(",")
+        ]
+
+    monkeypatch.setattr(
+        verifier,
+        "fetch_arxiv_metadata_batch_xml",
+        fake_fetch,
+    )
+    monkeypatch.setattr(
+        verifier,
+        "parse_arxiv_metadata_batch",
+        fake_parse,
+    )
+
+    results = fetch_reference_metadata(
+        references,
+        batch_size=2,
+    )
+
+    assert requested_batches == [
+        ["2401.00001", "2401.00002"],
+        ["2401.00003", "2401.00004"],
+        ["2401.00005"],
+    ]
+    assert len(results) == 5
+
+
+
+
+
+
+def test_chunk_arxiv_ids():
+    arxiv_ids = [
+        "1000.00001",
+        "1000.00002",
+        "1000.00003",
+        "1000.00004",
+        "1000.00005",
+    ]
+
+    assert chunk_arxiv_ids(
+            arxiv_ids, batch_size=2) == [
+            ["1000.00001", "1000.00002"],
+            ["1000.00003", "1000.00004"],
+            ["1000.00005"],
+        ]
+
+
+def test_chunk_arxiv_ids_rejects_invalid_size():
+    with pytest.raises(ValueError, match="Batch size must be positive"):
+        chunk_arxiv_ids(["1706.03762"], batch_size =0 )
+
+
 
 def test_audit_arxiv_citations_combines_findings(monkeypatch):
     unresolved_reference = Reference(
