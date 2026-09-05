@@ -1,0 +1,124 @@
+import arxit.doi_verifier as verifier
+
+from arxit.doi_verifier import (verify_doi_references, find_unresolved_doi_citations)
+from arxit.models import Reference, DoiCitationResult
+
+
+def test_find_unresolved_doi_citations():
+    reference = Reference(
+        label="8",
+        raw_text="Unknown paper. doi:10.9999/missing.",
+        doi="10.9999/missing",
+    )
+
+    results = [
+        DoiCitationResult(
+            reference=reference,
+            metadata=None
+        )
+    ]
+
+    findings = find_unresolved_doi_citations(results)
+
+    assert len(findings) == 1
+    assert findings[0].finding_type == ("unresolved_doi_citation")
+    assert findings[0].message == ("DOI 10.9999/missing could not be resolved.")
+    assert findings[0].reference == reference
+
+
+def test_resolved_doi_creates_no_unresolved_finding():
+    reference = Reference(
+        label="8",
+        raw_text="Example paper.",
+        doi="10.1000/example",
+    )
+
+    results = [
+        DoiCitationResult(
+            reference=reference,
+            metadata={
+                "DOI": "10.1000/example",
+                "title": ["Example Paper"],
+            },
+        )
+    ]
+
+    assert find_unresolved_doi_citations(results) == []
+
+
+
+def test_verify_doi_references_deduplicates_requests(monkeypatch):
+    first_reference = Reference(
+        label="1",
+        raw_text="First occurrence.",
+        doi="10.1000/example",
+    )
+    repeated_reference = Reference(
+        label="2",
+        raw_text="Repeated occurrence.",
+        doi="10.1000/example",
+    )
+    missing_reference = Reference(
+        label="3",
+        raw_text="Missing DOI.",
+        doi="10.9999/missing",
+    )
+
+    requested_dois = []
+
+    def fake_fetch(doi):
+        requested_dois.append(doi)
+
+        if doi == "10.1000/example":
+            return {
+                "DOI": doi,
+                "title": ["Example Paper"],
+            }
+
+        return None
+
+    monkeypatch.setattr(
+        verifier,
+        "fetch_crossref_metadata",
+        fake_fetch,
+    )
+
+    results = verify_doi_references(
+        [
+            first_reference,
+            repeated_reference,
+            missing_reference,
+        ]
+    )
+
+    assert requested_dois == [
+        "10.1000/example",
+        "10.9999/missing",
+    ]
+
+    assert len(results) == 3
+    assert results[0].metadata is not None
+    assert results[1].metadata is not None
+    assert results[2].metadata is None
+
+
+def test_verify_doi_references_skips_references_without_doi(
+    monkeypatch,
+):
+    reference = Reference(
+        label="1",
+        raw_text="No DOI here.",
+    )
+
+    def fail_if_called(doi):
+        raise AssertionError(
+            "Crossref should not be called"
+        )
+
+    monkeypatch.setattr(
+        verifier,
+        "fetch_crossref_metadata",
+        fail_if_called,
+    )
+
+    assert verify_doi_references([reference]) == []

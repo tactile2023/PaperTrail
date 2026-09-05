@@ -58,3 +58,10 @@ class Finding:
     finding_type: str
     message: str
     reference: Reference
+
+
+
+@dataclass
+class DoiCitationResult:
+    reference: Reference
+    metadata: dict | None
